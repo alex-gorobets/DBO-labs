@@ -6,5 +6,5 @@ This is repository for lab projects in Database organization for students of gro
 
 ========
 Git manuals:
-http://git-scm.com/book/ru
+http://git-scm.com/book/ru<br/>
 http://gitbyexample.org/
