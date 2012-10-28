@@ -1,4 +1,4 @@
-package lib;
+package lib.mappings;
 
 import java.io.IOException;
 import java.io.RandomAccessFile;
@@ -7,9 +7,8 @@ import java.util.LinkedList;
 /**
  * This class is dispatcher for indexes.
  * Indexes are offsets of mappings saved in key order.
- * This class contains internal container for indexes (e.g. LinkedList). When you add new index, internal container synchronizes with
- * with its file representation.  
- *
+ * This class contains internal container for indexes (e.g. LinkedList).
+ * When you add new index, internal container synchronizes with its file representation.  
  */
 public class MappingIndexer {
 	/**

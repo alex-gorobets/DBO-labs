@@ -1,11 +1,11 @@
-package tests;
+package tests.mappings;
 
 import static org.junit.Assert.*;
 
 import java.io.File;
 import java.io.IOException;
 
-import lib.MappingIndexer;
+import lib.mappings.MappingIndexer;
 
 import org.junit.Test;
 

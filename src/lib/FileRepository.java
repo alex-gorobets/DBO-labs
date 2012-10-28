@@ -3,6 +3,8 @@ package lib;
 import java.io.IOException;
 import java.io.RandomAccessFile;
 
+import lib.mappings.MappingDispatcher;
+
 /**
  * This class implements Repository interface by saving data in file database.<br/>
  * There are 3 type of files used by this repository:<br/>
