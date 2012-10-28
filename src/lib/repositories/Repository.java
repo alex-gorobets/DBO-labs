@@ -1,6 +1,8 @@
-package lib;
+package lib.repositories;
 
 import java.io.IOException;
+
+import lib.Model;
 
 public interface  Repository {
 

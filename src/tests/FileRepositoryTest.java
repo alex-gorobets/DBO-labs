@@ -1,15 +1,15 @@
 package tests;
 
-import lib.FileRepository;
 import lib.Model;
-import lib.Repository;
 import lib.SongModel;
+import lib.repositories.FileRepository;
+import lib.repositories.Repository;
+
 import org.junit.Test;
 
 import java.io.IOException;
 
 import static junit.framework.Assert.*;
-import static junit.framework.Assert.assertEquals;
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertNotNull;
 

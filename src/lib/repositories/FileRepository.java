@@ -1,8 +1,11 @@
-package lib;
+package lib.repositories;
 
 import java.io.IOException;
 import java.io.RandomAccessFile;
 
+import lib.Model;
+import lib.SongModel;
+import lib.mappings.Mapping;
 import lib.mappings.MappingDispatcher;
 
 /**
@@ -19,7 +22,7 @@ import lib.mappings.MappingDispatcher;
 
 public class FileRepository implements Repository {
     private RandomAccessFile db;
-    private MappingDispatcher md;
+    private MappingDispatcher mappingDispatcher;
 
     /**
      * Creates new database in specified file
@@ -28,7 +31,7 @@ public class FileRepository implements Repository {
      */
     public FileRepository(String fileName) throws IOException {
         db = new RandomAccessFile(fileName,"rw");
-        md = new MappingDispatcher(fileName);
+        mappingDispatcher = new MappingDispatcher(fileName);
         
     }
     @Override
@@ -65,7 +68,7 @@ public class FileRepository implements Repository {
     @Override
     public Model get(String key) throws IOException {
     	//!TODO remove hard coding
-    	db.seek(allocateKey(key));
+    	db.seek(getObjectOffset(key));
     	byte[] out = new byte[56];
     	
     	db.readFully(out);
@@ -74,7 +77,7 @@ public class FileRepository implements Repository {
 
     @Override
     public void add(Model model) throws IOException {
-    	md.addMapping(model.getKey(), db.getFilePointer());
+    	mappingDispatcher.addMapping(new Mapping(model.getKey(), db.getFilePointer()));
         db.write(model.toByteArray());
     }
 
@@ -87,16 +90,4 @@ public class FileRepository implements Repository {
     public void remove(String key) {
 
     }
-
-    /**
-     * Returns object offset by its key
-     * @param key unique key of object
-     * @return (long) offset
-     * @throws IOException
-     */
-    private long allocateKey(String key) throws IOException{
-    	long first = md.getMapping(0).offset;
-		return first;
-    }
-
 }

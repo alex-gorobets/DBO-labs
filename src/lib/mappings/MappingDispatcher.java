@@ -2,6 +2,7 @@ package lib.mappings;
 
 import java.io.IOException;
 import java.io.RandomAccessFile;
+import java.util.NoSuchElementException;
 
 import lib.ByteConverter;
 
@@ -131,5 +132,32 @@ public class MappingDispatcher {
         System.arraycopy(keyBytes, 0, bytes, 0, length);
 
         return bytes;
+    }
+    
+    /**
+     * Returns object offset by its key, using binary search
+     * @param key unique key of object
+     * @return (long) offset
+     * @throws IOException
+     */
+    public long getObjectOffset(String key) throws IOException{
+    	long first = 0;
+    	long last = getMappingsAmount();
+    	long middle;
+    	
+    	while(first < last){
+    		middle = first + (last - first) / 2;
+    		
+    		if(key.compareTo(getMapping(middle).getKey()) <= 0){
+    			last = middle;
+    		} else {
+    			first = middle + 1;
+    		}
+    	}
+    	
+    	if (last < getMappingsAmount() && getMapping(last).getKey().equals(key)){
+    		return getMapping(last).getOffset();
+    	} else
+    		throw new NoSuchElementException();
     }
 }
