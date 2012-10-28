@@ -31,6 +31,10 @@ public class FileRepository implements Repository {
         md = new MappingDispatcher(fileName);
         
     }
+    @Override
+    public long size() {
+        return 0;
+    }
 
     /**
      * Returns all objects in database

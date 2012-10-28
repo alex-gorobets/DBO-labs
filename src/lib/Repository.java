@@ -12,4 +12,6 @@ public interface  Repository {
     public void set(int key, Model model);
     public void remove(int key);
 	void set(String key, Model model);
+
+    long size();
 }
