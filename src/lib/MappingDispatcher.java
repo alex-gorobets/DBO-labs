@@ -24,12 +24,12 @@ public class MappingDispatcher {
 
         System.out.println("Mapping file:");
         do{
-            mapping.seek(indexer.getOffset(mappingOffset));
+            mapping.seek(indexer.getIndex(mappingOffset));
             System.out.println("\t" + getKey());
             mappingOffset++;
         } while(mappingOffset < this.getLength() && key.compareTo(getKey()) > 0);
 
-        indexer.set(mappingOffset-1, writePosition);
+        indexer.addIndex(mappingOffset-1, writePosition);
         this.write(key, offset);
     }
 
@@ -38,7 +38,7 @@ public class MappingDispatcher {
     }
     
     public Mapping getMapping(long i) throws IOException{
-    	mapping.seek(indexer.getOffset(i));
+    	mapping.seek(indexer.getIndex(i));
     	
     	Mapping m = new Mapping();
     	m.key = getKey();

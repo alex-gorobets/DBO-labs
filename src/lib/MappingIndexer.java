@@ -5,43 +5,74 @@ import java.io.RandomAccessFile;
 import java.util.LinkedList;
 
 /**
- * Created by IntelliJ IDEA.
- * User: Stas
- * Date: 14.10.12
- * Time: 17:42
- * To change this template use File | Settings | File Templates.
+ * This class is dispatcher for indexes.
+ * Indexes are offsets of mappings saved in key order.
+ * This class contains internal container for indexes (e.g. LinkedList). When you add new index, internal container synchronizes with
+ * with its file representation.  
+ *
  */
 public class MappingIndexer {
-    private LinkedList<Long> indexes = new LinkedList<Long>();
-    RandomAccessFile f;
-    public MappingIndexer(String indexFile) throws IOException {
-        f = new RandomAccessFile(indexFile, "rw");
-
-        for(long i = 0; i < f.length(); i++){
-            indexes.add((int) i, f.readLong());
-        }
-    }
+	/**
+	 * Container in RAM, where indexes stores
+	 */
+    private LinkedList<Long> indexesContainer = new LinkedList<Long>();
     
-    public void save() throws IOException {
-        f.seek(0);
+    /**
+     * File on disk, fully matches with indexesContainer
+     */
+    private RandomAccessFile indexesFileRepresentation;
+    
+    /**
+     * Initializing new MappingIndexer from file. If file exists, MappingIndexer will import all it content into indexes container.
+     * If file not exists, MappingIndexer will create new empty file and new empty indexes container
+     * @param indexesFile filename
+     * @throws IOException
+     */
+    public MappingIndexer(String indexesFile) throws IOException {
+        indexesFileRepresentation = new RandomAccessFile(indexesFile, "rw");
 
-        for(long l : indexes) {
-            f.writeLong(l);
+        for(long i = 0; i < indexesFileRepresentation.length() / (Long.SIZE / 8); i++){
+            indexesContainer.add((int) i, indexesFileRepresentation.readLong());
         }
-
-        System.out.println(indexes);
     }
 
-    public void set(long key,long offset) throws IOException {
-        System.out.println(key + " " + offset);
-        indexes.add((int) key, offset);
+    /**
+     * Adds new index on position offset. Synchronize indexes container into file
+     * @param offset
+     * @param index
+     * @throws IOException
+     */
+    public void addIndex(long offset,long index) throws IOException {
+        indexesContainer.add((int) offset, index);
         this.save();
     }
 
-    public long getOffset(long index){
-        if(indexes.size() == 0)
-            return 0;
-        else
-            return indexes.get((int) index);
+    /**
+     * Retrieving index by it offset
+     * @param offset
+     * @return index
+     */
+    public long getIndex(long offset){
+        return indexesContainer.get((int) offset);
+    }
+    
+    /**
+     * Synchronizing indexes container into file
+     * @throws IOException
+     */
+    private void save() throws IOException {
+        indexesFileRepresentation.seek(0);
+
+        for(long l : indexesContainer) {
+            indexesFileRepresentation.writeLong(l);
+        }
+    }
+    
+    /**
+     * Closing mapping indexer file after using. Must be called to prevent file destruction
+     * @throws IOException
+     */
+    public void close() throws IOException{
+    	indexesFileRepresentation.close();
     }
 }
