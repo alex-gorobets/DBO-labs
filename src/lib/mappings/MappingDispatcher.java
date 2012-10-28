@@ -47,6 +47,9 @@ public class MappingDispatcher {
      * @throws IOException
      */
     public void addMapping(Mapping mapping) throws IOException {
+    	//System.out.println("Inserting " + mapping.getKey() + ", before: ");
+    	//printIndexer();
+    	
     	if(getMappingsAmount() == 0){
     		//writing first mapping
             mappingIndexer.addIndex(0, 0);
@@ -55,19 +58,19 @@ public class MappingDispatcher {
             return;
     	}
     	
-        long writePosition = mappingsFile.getFilePointer();
+        //long writePosition = mappingsFile.getFilePointer();
         long mappingOffset = 0;
 
-        mappingsFile.seek(0);
-
-        do{
-            mappingsFile.seek(mappingIndexer.getIndex(mappingOffset));
+        while(mappingOffset < getMappingsAmount() && mapping.getKey().compareTo(readKey(mappingIndexer.getIndex(mappingOffset))) > 0){
+        	//System.out.println("\t\t > " + readKey(mappingIndexer.getIndex(mappingOffset)));
             mappingOffset++;
-        } while(mappingOffset < getMappingsAmount()
-        		&& mapping.getKey().compareTo(readKey()) > 0);
-
-        mappingIndexer.addIndex(mappingOffset-1, writePosition);
+        }
+        
+       	mappingIndexer.addIndex(mappingOffset, mappingsFile.length());        
         writeMapping(mapping);
+        
+        //System.out.println("after:");
+    	//printIndexer();
     }
     
     /**
@@ -76,10 +79,8 @@ public class MappingDispatcher {
      * @return mapping
      * @throws IOException
      */
-    public Mapping getMapping(long index) throws IOException{
-    	mappingsFile.seek(mappingIndexer.getIndex(index)); 
-    	
-    	return new Mapping(readKey(), mappingsFile.readLong());
+    public Mapping getMapping(long index) throws IOException{    	
+    	return new Mapping(readKey(mappingIndexer.getIndex(index)), mappingsFile.readLong());
     }
 
     /**
@@ -88,15 +89,18 @@ public class MappingDispatcher {
      * @throws IOException
      */
     public long getMappingsAmount() throws IOException {
-        return (mappingsFile.length() / (KEY_LENGTH + OFFSET_LENGTH));
+        return mappingIndexer.getIndexesAmount();
     }
     
     /**
      * Reading key from current position in mapping file
-     * @return
+     * @param index index of mapping
+     * @return string key
      * @throws IOException
      */
-    private String readKey() throws IOException {
+    private String readKey(long index) throws IOException {
+    	mappingsFile.seek(index); 
+
         byte[] keyByteRepresentation = new byte[KEY_LENGTH];
         mappingsFile.read(keyByteRepresentation, 0, KEY_LENGTH);
 
@@ -134,6 +138,10 @@ public class MappingDispatcher {
         return bytes;
     }
     
+    public void removeMapping(String key) throws IOException {
+    	mappingIndexer.removeOffset(getMappingOffset(key));
+    }
+    
     /**
      * Returns object offset by its key, using binary search
      * @param key unique key of object
@@ -141,6 +149,16 @@ public class MappingDispatcher {
      * @throws IOException
      */
     public long getObjectOffset(String key) throws IOException{
+    	return getMapping(getMappingOffset(key)).getOffset();
+    }
+    
+    /**
+     * Returns mapping offset by its object key, using binary search
+     * @param key unique key of object
+     * @return (long) offset
+     * @throws IOException
+     */
+    private long getMappingOffset(String key) throws IOException{
     	long first = 0;
     	long last = getMappingsAmount();
     	long middle;
@@ -156,8 +174,20 @@ public class MappingDispatcher {
     	}
     	
     	if (last < getMappingsAmount() && getMapping(last).getKey().equals(key)){
-    		return getMapping(last).getOffset();
+    		return last;
     	} else
     		throw new NoSuchElementException();
-    }
+    }    
+
+	public void close() throws IOException {
+		mappingIndexer.close();
+		mappingsFile.close();
+	}
+	
+/*	private void printIndexer() throws IOException{
+		for(long i : mappingIndexer.indexesContainer){
+			System.out.println("\t " + readKey(i));
+		}
+	}*/
+
 }

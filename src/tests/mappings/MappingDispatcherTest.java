@@ -23,7 +23,8 @@ public class MappingDispatcherTest {
         
         mappingDispatcher.addMapping(new Mapping("Unforgiven", 0));
         mappingDispatcher.addMapping(new Mapping("Fade to black", 1));
-        mappingDispatcher.addMapping(new Mapping("Nothing else matters", 2));		
+        mappingDispatcher.addMapping(new Mapping("Nothing else matters", 2));
+        mappingDispatcher.addMapping(new Mapping("Zet index", 3));
 	}
 	
     @Test
@@ -31,8 +32,9 @@ public class MappingDispatcherTest {
         assertEquals("Fade to black", mappingDispatcher.getMapping(0).getKey());
         assertEquals("Nothing else matters", mappingDispatcher.getMapping(1).getKey());
         assertEquals("Unforgiven", mappingDispatcher.getMapping(2).getKey());
+        assertEquals("Zet index", mappingDispatcher.getMapping(3).getKey());
         
-        assertEquals(3, mappingDispatcher.getMappingsAmount());
+        assertEquals(4, mappingDispatcher.getMappingsAmount());
     }
     
     @Test

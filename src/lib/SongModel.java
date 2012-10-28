@@ -2,7 +2,7 @@ package lib;
 
 import java.util.Arrays;
 
-public class SongModel extends Model{
+public class SongModel{
     public final static int SERIALIZED_LENGTH = 56;
 
     private String title;
@@ -90,13 +90,22 @@ public class SongModel extends Model{
         this.duration = duration;
     }
 
-    public boolean equals(SongModel m){
-        return this.title.equals(m.getTitle()) && this.artist.equals(m.getArtist()) && this.album.equals(m.getAlbum())
-                && this.year.equals(m.getYear()) && this.duration == getDuration();
+    @Override
+    public boolean equals(Object obj){
+    	SongModel model;
+    	if(obj instanceof SongModel){
+    		model = (SongModel) obj;
+    	} else
+    		return false;
+    	
+        return this.title.equals(model.getTitle()) && this.artist.equals(model.getArtist()) && this.album.equals(model.getAlbum())
+                && this.year.equals(model.getYear()) && this.duration == getDuration();
     }
 
+    @Override
     public String toString() {
-        return artist + " " + title + " " + album + " " + year + " " + duration;
+        //return "--" + getKey() + "--" + artist + " " + title + " " + album + " " + year + " " + duration;
+    	return getKey();
     }
     
     public String getKey(){

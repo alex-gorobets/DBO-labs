@@ -14,7 +14,7 @@ public class MappingIndexer {
 	/**
 	 * Container in RAM, where indexes stores
 	 */
-    private LinkedList<Long> indexesContainer = new LinkedList<Long>();
+    public LinkedList<Long> indexesContainer = new LinkedList<Long>();
     
     /**
      * File on disk, fully matches with indexesContainer
@@ -42,6 +42,7 @@ public class MappingIndexer {
      * @throws IOException
      */
     public void addIndex(long offset,long index) throws IOException {
+    	System.out.println("Insert on " + offset + " value " + index);
         indexesContainer.add((int) offset, index);
         this.save();
     }
@@ -74,4 +75,17 @@ public class MappingIndexer {
     public void close() throws IOException{
     	indexesFileRepresentation.close();
     }
+
+	public void removeOffset(long index) throws IOException {
+		System.out.println("removing offset " + index);
+		System.out.println("before: "+indexesContainer);
+		indexesContainer.remove((int) index);
+		System.out.println("after: "+indexesContainer);
+		
+		this.save();
+	}
+
+	public long getIndexesAmount() {
+		return indexesContainer.size();
+	}
 }

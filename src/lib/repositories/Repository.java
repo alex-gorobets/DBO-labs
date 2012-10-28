@@ -2,18 +2,18 @@ package lib.repositories;
 
 import java.io.IOException;
 
-import lib.Model;
+import lib.SongModel;
 
 public interface  Repository {
 
-    public Model[] get();
-    public Model[] get(int limit, int offset);
-    public Model get(String key) throws IOException;
+    public SongModel[] get() throws IOException;
+    public SongModel[] get(int limit, int offset) throws IOException;
+    public SongModel get(String key) throws IOException;
     
-    public void add(Model model) throws IOException;
-    public void set(String key, Model model);
-    public void remove(String key);
+    public void add(SongModel model) throws IOException;
+    void set(SongModel model) throws IOException;
+    public void remove(String key) throws IOException;
 
 
-    long size();
+    long size() throws IOException;
 }

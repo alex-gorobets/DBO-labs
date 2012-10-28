@@ -2,8 +2,8 @@ package lib.repositories;
 
 import java.io.IOException;
 import java.io.RandomAccessFile;
+import java.util.NoSuchElementException;
 
-import lib.Model;
 import lib.SongModel;
 import lib.mappings.Mapping;
 import lib.mappings.MappingDispatcher;
@@ -17,8 +17,6 @@ import lib.mappings.MappingDispatcher;
  *     <li><b>indexes file</b> (.index) - contains sorted by Key offsets of Mappings</li>
  * </ul>
  */
-
-//!TODO implement generic types
 
 public class FileRepository implements Repository {
     private RandomAccessFile db;
@@ -35,28 +33,50 @@ public class FileRepository implements Repository {
         
     }
     @Override
-    public long size() {
-        return 0;
+    public long size() throws IOException {
+        return mappingDispatcher.getMappingsAmount();
     }
 
     /**
-     * Returns all objects in database
+     * Returns all objects in database sorted by keys
      * @return Model[]
+     * @throws IOException 
      */
     @Override
-    public Model[] get() {
-        return new SongModel[0];  //To change body of implemented methods use File | Settings | File Templates.
+    public SongModel[] get() throws IOException {
+    	SongModel[] objects = new SongModel[(int) size()];
+    	
+    	for(int i = 0; i < size(); i++){
+        	db.seek(mappingDispatcher.getMapping(i).getOffset());
+        	byte[] out = new byte[SongModel.SERIALIZED_LENGTH];
+        	
+        	db.readFully(out);
+        	objects[i] = new SongModel(out);
+    	}
+    	
+        return objects;
     }
 
     /**
-     * Returns objects starting with offset. Maximal amount of objects = limit
+     * Returns objects starting with offset. Maximal amount of objects = limit. Object sorted by keys
      * @param limit maximal amount of objects
      * @param offset starting index (from 0)
      * @return Model[]
+     * @throws IOException 
      */
     @Override
-    public Model[] get(int limit, int offset) {
-        return new SongModel[0];  //To change body of implemented methods use File | Settings | File Templates.
+    public SongModel[] get(int limit, int offset) throws IOException {
+    	SongModel[] objects = new SongModel[(int) size()];
+    	
+    	for(int i = offset, j = 0; i < size() && j < limit; i++){
+        	db.seek(mappingDispatcher.getMapping(i).getOffset());
+        	byte[] out = new byte[SongModel.SERIALIZED_LENGTH];
+        	
+        	db.readFully(out);
+        	objects[i] = new SongModel(out);
+    	}
+    	
+        return objects;
     }
 
     /**
@@ -66,28 +86,51 @@ public class FileRepository implements Repository {
      * @throws IOException
      */
     @Override
-    public Model get(String key) throws IOException {
-    	//!TODO remove hard coding
-    	db.seek(getObjectOffset(key));
-    	byte[] out = new byte[56];
+    public SongModel get(String key) throws IOException {
+    	long offset;
+    	
+    	try{
+    		offset = mappingDispatcher.getObjectOffset(key);
+    	} catch (NoSuchElementException e){
+    		return null;
+    	}
+    	
+    	db.seek(offset);
+    	byte[] out = new byte[SongModel.SERIALIZED_LENGTH];
     	
     	db.readFully(out);
     	return new SongModel(out);
     }
 
     @Override
-    public void add(Model model) throws IOException {
+    public void add(SongModel model) throws IOException {
+    	db.seek(db.length());
     	mappingDispatcher.addMapping(new Mapping(model.getKey(), db.getFilePointer()));
         db.write(model.toByteArray());
     }
 
     @Override
-    public void set(String key, Model model) {
-        //To change body of implemented methods use File | Settings | File Templates.
+    public void set(SongModel model) throws IOException {
+    	long offset;
+    	
+    	try{
+    		offset = mappingDispatcher.getObjectOffset(model.getKey());
+    	} catch (NoSuchElementException e){
+    		add(model);
+    		return;
+    	}
+    	
+    	db.seek(offset);
+    	db.write(model.toByteArray());
     }
 
     @Override
-    public void remove(String key) {
-
+    public void remove(String key) throws IOException {
+    	mappingDispatcher.removeMapping(key);
+    }
+    
+    public void close() throws IOException{
+    	db.close();
+    	mappingDispatcher.close();
     }
 }
