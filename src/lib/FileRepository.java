@@ -84,7 +84,7 @@ public class FileRepository implements Repository {
     }
 
     @Override
-    public void remove(int key) {
+    public void remove(String key) {
 
     }
 
@@ -99,10 +99,4 @@ public class FileRepository implements Repository {
 		return first;
     }
 
-
-	@Override
-	public void set(int key, Model model) {
-		// TODO Auto-generated method stub
-		
-	}
 }

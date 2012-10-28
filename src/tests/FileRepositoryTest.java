@@ -1,6 +1,7 @@
 package tests;
 
 import lib.FileRepository;
+import lib.Model;
 import lib.Repository;
 import lib.SongModel;
 import org.junit.Test;
@@ -9,6 +10,8 @@ import java.io.IOException;
 
 import static junit.framework.Assert.*;
 import static junit.framework.Assert.assertEquals;
+import static org.junit.Assert.assertArrayEquals;
+import static org.junit.Assert.assertNotNull;
 
 public class FileRepositoryTest {
 
@@ -19,8 +22,33 @@ public class FileRepositoryTest {
     }
 
     @Test
-    public void testGet() throws Exception {
+    public void testGetAll() throws Exception {
+        Model[] songModels = new SongModel[3];
+        songModels[0] = new SongModel("FirstTitle","FirstArtist","FirstAlbum",1998,(float)11.2);
+        songModels[1] = new SongModel("SecondTitle","SecondArtist","SecondAlbum",1998,(float)11.2);
+        songModels[2] = new SongModel("ThirdTitle","ThirdArtist","ThirdAlbum",1998,(float)11.2);
 
+        fileRepository.add(new SongModel("FirstTitle","FirstArtist","FirstAlbum",1998,(float)11.2));
+        fileRepository.add(new SongModel("SecondTitle","SecondArtist","SecondAlbum",1998,(float)11.2));
+        fileRepository.add(new SongModel("ThirdTitle","ThirdArtist","ThirdAlbum",1998,(float)11.2));
+
+        assertArrayEquals(songModels,fileRepository.get());
+
+        fileRepository.remove("FirstTitle");
+        fileRepository.remove("SecondTitle");
+        fileRepository.remove("ThirdTitle");
+    }      
+    
+    @Test
+    public void testGetByKey() throws IOException{
+        fileRepository.add(new SongModel("FirstTitle","FirstArtist","FirstAlbum",1998,(float)11.2));
+        fileRepository.add(new SongModel("SecondTitle","SecondArtist","SecondAlbum",1998,(float)11.2));
+
+        Model m1 = new SongModel("SecondTitle","SecondArtist","SecondAlbum",1998,(float)11.2);       
+        assertEquals(m1,fileRepository.get("SecondTitle"));
+
+        fileRepository.remove("FirstTitle");
+        fileRepository.remove("SecondTitle");
     }
 
     @Test
@@ -42,7 +70,23 @@ public class FileRepositoryTest {
     }
 
     @Test
-    public void testAdd() throws Exception {
+    public void testSet() throws IOException{
+        fileRepository.add(new SongModel("FirstTitle","FirstArtist","FirstAlbum",1998,(float)11.2));
+        fileRepository.add(new SongModel("SecondTitle","SecondArtist","SecondAlbum",1998,(float)11.2));
 
+        Model m1 = new SongModel("ThirdTitle","ThirdArtist","ThirdAlbum",1998,(float)11.2);
+        fileRepository.set("SecondTitle",m1);
+        assertEquals(m1,fileRepository.get(1,1));
+
+        fileRepository.remove("FirstTitle");
+        fileRepository.remove("ThirdTitle");
+    }
+
+    @Test
+    public void testAdd() throws Exception {
+        fileRepository.add(new SongModel("FirstTitle","FirstArtist","FirstAlbum",1998,(float)11.2));
+        assertNotNull(fileRepository.get("FirstTitle"));
+
+        fileRepository.remove("FirstTitle");
     }
 }
