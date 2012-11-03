@@ -3,6 +3,7 @@ out
 bin
 data
 /tests
+/lib
 
 DBA-lab.iml
 .project
@@ -15,3 +16,4 @@ test.mapping
 
 .classpath
 .settings
+msdb.war

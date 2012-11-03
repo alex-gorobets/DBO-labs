@@ -73,6 +73,7 @@ public class MappingIndexer {
      * @throws IOException
      */
     public void close() throws IOException{
+    	this.save();
     	indexesFileRepresentation.close();
     }
 

@@ -1,9 +1,11 @@
 package lib;
 
 import java.util.Arrays;
+import org.json.*;
+
 
 public class SongModel{
-    public final static int SERIALIZED_LENGTH = 56;
+    public final static int SERIALIZED_LENGTH = 104;
 
     private String title;
     private String artist;
@@ -19,7 +21,23 @@ public class SongModel{
         this.duration = duration;
     }
 
+    public SongModel(JSONObject json) throws JSONException{
+    	this(json.getString("title"),
+    			json.getString("artist"),
+    			json.getString("album"),
+    			json.getInt("year"),
+    			(float) json.getDouble("duration"));
+    }
 
+    public SongModel(byte[] in) {
+        //!TODO remove hard coding
+        this(ByteConverter.bytesToString(Arrays.copyOfRange(in, 0, 32)),
+        		ByteConverter.bytesToString(Arrays.copyOfRange(in, 32, 64)),
+        		ByteConverter.bytesToString(Arrays.copyOfRange(in, 64, 96)),
+        		ByteConverter.bytesToInt(Arrays.copyOfRange(in, 96, 100)),
+        		ByteConverter.bytesToFloat(Arrays.copyOfRange(in, 100, 104)));
+    }
+    
     public byte[] toByteArray() {
         byte[] out = new byte[SERIALIZED_LENGTH];
         int offset = 0;
@@ -39,15 +57,6 @@ public class SongModel{
         System.arraycopy(ByteConverter.getBytes(getDuration()), 0, out, offset,ByteConverter.FLOAT_LENGTH);
 
         return out;
-    }
-
-    public SongModel(byte[] in) {
-        //!TODO remove hard coding
-        setTitle(ByteConverter.bytesToString(Arrays.copyOfRange(in, 0, 16)));
-        setArtist(ByteConverter.bytesToString(Arrays.copyOfRange(in, 16, 32)));
-        setAlbum(ByteConverter.bytesToString(Arrays.copyOfRange(in, 32, 48)));
-        setYear(ByteConverter.bytesToInt(Arrays.copyOfRange(in, 48, 52)));
-        setDuration(ByteConverter.bytesToFloat(Arrays.copyOfRange(in, 52, 56)));
     }
 
     public String getTitle() {
@@ -104,11 +113,21 @@ public class SongModel{
 
     @Override
     public String toString() {
-        //return "--" + getKey() + "--" + artist + " " + title + " " + album + " " + year + " " + duration;
-    	return getKey();
+        return "--" + getKey() + "--" + artist + " " + title + " " + album + " " + year + " " + duration;
+    	//return getKey();
     }
     
     public String getKey(){
     	return title;
+    }
+    
+    public JSONObject toJson() throws JSONException{
+    	return new JSONObject()
+		.put("key", getKey())
+    	.put("artist", artist)
+    	.put("title", title)
+    	.put("album", album)
+    	.put("year", year)
+		.put("duration", duration);
     }
 }

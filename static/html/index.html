@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>Million songs database</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <!-- Le styles -->
+    <link href="/msdb/css/bootstrap.css" rel="stylesheet">
+    <style>
+      body {
+        padding-top: 60px; /* 60px to make the container go all the way to the bottom of the topbar */
+      }
+    </style>
+    <link href="/msdb/css/bootstrap-responsive.css" rel="stylesheet">
+
+    <!-- Le HTML5 shim, for IE6-8 support of HTML5 elements -->
+    <!--[if lt IE 9]>
+      <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+
+    <!-- Le fav and touch icons -->
+    <link rel="shortcut icon" href="/msdb/ico/favicon.ico">
+    <link rel="apple-touch-icon-precomposed" sizes="144x144" href="/msdb/ico/apple-touch-icon-144-precomposed.png">
+    <link rel="apple-touch-icon-precomposed" sizes="114x114" href="/msdb/ico/apple-touch-icon-114-precomposed.png">
+    <link rel="apple-touch-icon-precomposed" sizes="72x72" href="/msdb/ico/apple-touch-icon-72-precomposed.png">
+    <link rel="apple-touch-icon-precomposed" href="/msdb/ico/apple-touch-icon-57-precomposed.png">
+  </head>
+
+  <body>
+
+    <div class="navbar navbar-inverse navbar-fixed-top">
+      <div class="navbar-inner">
+        <div class="container">
+          <a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </a>
+          <a class="brand" href="#">Million songs database</a>
+          <div class="nav-collapse collapse">
+            <ul class="nav">
+              <li class="active"><a href="/msdb/html/login.html">Home</a></li>
+              <li><a href="/msdb/html/about-us.html">About us</a></li>
+            </ul>
+          </div><!--/.nav-collapse -->
+        </div>
+      </div>
+    </div>
+
+    <div class="container">
+    	<div id="menu">
+    		<a href="#" id="menu-add" class="btn btn-primary">Add new record</a>
+    		<a href="#" id="menu-find" class="btn btn-info">Find records</a>
+    		<a href="#" id="menu-delete" class="btn btn-danger disabled">Delete records</a>
+    		<a href="#" id="menu-edit" class="btn btn-info disabled">Edit record</a>
+    	</div>
+    	
+    	<div id="modal-delete" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+ 			<div class="modal-header">
+    			<button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+    			<h3 id="myModalLabel">Removing confirmation</h3>
+  			</div>
+  			<div class="modal-body">
+    			<p>Are sure want remove selected items?</p>
+  			</div>
+  			<div class="modal-footer">
+    			<button class="btn" data-dismiss="modal" aria-hidden="true">Cancel</button>
+    			<button class="btn btn-primary" id="modal-confirm-removing">Remove</button>
+  			</div>
+		</div>
+    	
+    	<div id="modal-edit" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+  			<div class="modal-header">
+  				<button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+  				  <h3 id="myModalLabel">Edit song</h3>
+  			</div>
+  			<div class="modal-body">
+				<form class="form-horizontal" id="modal-edit-form">			
+				  <div class="control-group">
+				    <label class="control-label" for="inputArtist">Artist</label>
+					    <div class="controls">
+					      <input type="text" name="artist" id="inputArtist" placeholder="Artist">
+				    </div>
+				  </div>
+				  <div class="control-group">
+				    <label class="control-label" for="inputTitle">Title</label>
+					    <div class="controls">
+					      <input type="text" name="title" disabled="disabled" id="inputTitle" placeholder="Title">
+				    </div>
+				  </div>
+				  <div class="control-group">
+				    <label class="control-label" for="inputAlbum">Album</label>
+					    <div class="controls">
+					      <input type="text" name="album" id="inputAlbum" placeholder="Album">
+				    </div>
+				  </div>
+				  <div class="control-group">
+				    <label class="control-label" for="inputAlbum">Year</label>
+					    <div class="controls">
+					      <input type="text" name="year" id="inputYear" placeholder="Year">
+				    </div>
+				  </div>
+				  <div class="control-group">
+				    <label class="control-label" for="inputDuration">Duration</label>
+					    <div class="controls">
+					      <input type="text" name="duration" id="inputDuration" placeholder="Duration">
+				    </div>
+				  </div>
+				</form>
+
+  			</div>
+  			<div class="modal-footer">
+ 			   <button class="btn" data-dismiss="modal" aria-hidden="true">Close</button>
+ 			   <button class="btn btn-primary" id="modal-save">Save changes</button>
+ 			</div>
+		</div>
+
+<br/><br/>
+<table class="table table-hover">
+              <thead>
+                <tr>
+		  <th width="30px"><input id="select-all" type="checkbox"/></th>
+                  <th>Key</th>
+                  <th>Artist</th>
+                  <th>Title</th>
+                  <th>Album</th>
+                  <th>Year</th>
+                  <th>Duration</th>
+                </tr>
+              </thead>
+              <tbody id="container">
+              </tbody>
+            </table>
+
+<div class="pagination pagination-centered">
+              <ul>
+                <li class="disabled"><a href="#">«</a></li>
+                <li class="active"><a href="#">1</a></li>
+                <li><a href="#">2</a></li>
+                <li><a href="#">3</a></li>
+                <li><a href="#">4</a></li>
+                <li><a href="#">5</a></li>
+                <li><a href="#">»</a></li>
+             </ul>
+            </div>
+
+    </div> <!-- /container -->
+
+    <!-- Le javascript
+    ================================================== -->
+    <!-- Placed at the end of the document so the pages load faster -->
+    <script src="/msdb/js/jquery.js"></script>
+    <script src="/msdb/js/bootstrap-transition.js"></script>
+    <script src="/msdb/js/bootstrap-alert.js"></script>
+    <script src="/msdb/js/bootstrap-modal.js"></script>
+    <script src="/msdb/js/bootstrap-dropdown.js"></script>
+    <script src="/msdb/js/bootstrap-scrollspy.js"></script>
+    <script src="/msdb/js/bootstrap-tab.js"></script>
+    <script src="/msdb/js/bootstrap-tooltip.js"></script>
+    <script src="/msdb/js/bootstrap-popover.js"></script>
+    <script src="/msdb/js/bootstrap-button.js"></script>
+    <script src="/msdb/js/bootstrap-collapse.js"></script>
+    <script src="/msdb/js/bootstrap-carousel.js"></script>
+    <script src="/msdb/js/bootstrap-typeahead.js"></script>
+    <script src="http://ajax.microsoft.com/ajax/jquery.templates/beta1/jquery.tmpl.min.js"></script>
+    <script type="text/javascript">
+    	$(document).ready(function (){
+    		$.fn.serializeObject = function()
+    		{
+    		    var o = {};
+    		    var a = this.serializeArray();
+    		    $.each(a, function() {
+    		        if (o[this.name] !== undefined) {
+    		            if (!o[this.name].push) {
+    		                o[this.name] = [o[this.name]];
+    		            }
+    		            o[this.name].push(this.value || '');
+    		        } else {
+    		            o[this.name] = this.value || '';
+    		        }
+    		    });
+    		    return o;
+    		};
+    		
+    		$("#container").bind("contentChanged", function(){
+    			$.ajax({
+    			  url: "/msdb/ajax?do=getAll",
+    			  data: "",
+    			  success: function(response){
+    				  	$("#container").html("");
+    		    		$("#rowTemplate").tmpl(response.data).appendTo("#container");
+    		    		
+    		    		$("#container").children("tr").click(function(){
+    		    			var input = $(this).find("input");
+    		    			$(input).prop("checked", !$(input).prop("checked"));
+    		    			
+    		    			$("#menu").trigger("containerChanged");
+    		    		});
+    		    		
+/*     		    		$("#select-all").click(function(){
+    		    			console.log(this)
+    		    			var checked = $(this).prop("checked");
+    		    			checked = !checked;
+    		    			$(this).prop("checked", checked);
+
+    		    			$.each($("#container > tr > td > input"), function(key, input){
+        		    			$(input).prop("checked", checked);
+    		    			});
+    		    		}); */
+    		    		
+    		    		$("#menu").bind("containerChanged", function(){
+    		    			var activeItems = 0;
+    		    			
+    		    			$.each($("#container > tr > td > input"), function(key, input){
+        		    			if($(input).prop("checked")){
+        		    				activeItems++;
+        		    			}
+    		    			});
+    		    			
+    		    			if(activeItems == 1){
+    		    				$("#menu-edit").removeClass("disabled");
+    		    			} else {
+    		    				$("#menu-edit").addClass("disabled");    		    				
+    		    			}
+    		    			
+    		    			if(activeItems > 0){
+    		    				$("#menu-delete").removeClass("disabled");
+    		    			} else {
+    		    				$("#menu-delete").addClass("disabled");    		    				
+    		    			}
+    		    		});
+    		    		
+    		    		$("#menu-delete").click(function(){
+    		    			if(!$(this).hasClass("disabled")){
+    		    				$("#modal-delete").modal("show");
+
+    	    		    		$("#modal-confirm-removing").click(function(){
+    		    					var removedKeys = new Array();
+    		    					$.each($("#container").find("input:checked"), function(key, input){
+    		    						removedKeys[key] = $(input).data("key");
+    		    					});
+    		    				
+    		    					$.ajax({
+  		    	    			 		url: "/msdb/ajax?do=remove&keys="+JSON.stringify(removedKeys),
+  		    	    			 		success: function(response){
+		    	    		    			$("#menu").trigger("containerChanged");
+		    		    					$("#container").trigger("contentChanged");
+  		    	    			 		}
+    		    	    			});
+    		    	    		
+    		    					$("#modal-delete").modal("hide");
+    	    		    		});
+    		    			}
+    		    		});
+    		    		
+    		    		$("#menu-edit").click(function(){
+    		    			if(!$(this).hasClass("disabled")){
+    		    				var key = $("#container").find("input:checked").data("key");
+    		    	    		$.ajax({
+    		    	    			  url: "/msdb/ajax?do=getByKey&key="+key,
+    		    	    			  data: "",
+    		    	    			  success: function(response){
+		    	    						$("#inputArtist").val(response.artist);
+		    	    						$("#inputTitle").val(response.title);
+		    	    						$("#inputAlbum").val(response.album);
+		    	    						$("#inputYear").val(response.year);
+		    	    						$("#inputDuration").val(response.duration);
+    		    	    					
+    		    		    				$("#modal-edit").modal("show");
+    		    		    				
+    		    	    		    		$("#modal-save").click(function(){
+    		    	    		    			var json = $("#modal-edit-form").serializeObject();
+    		        		    	    		$.ajax({
+    		      		    	    			 	url: "/msdb/ajax?do=set&object="+JSON.stringify(json),
+    		      		    	    			 	success: function(response){
+    	        		    		    				$("#container").trigger("contentChanged");
+    		      		    	    			 	}
+    		        		    	    		});
+    		        		    	    		
+        		    		    				$("#modal-edit").modal("hide");
+    		    	    		    		});
+    		    	    		    		
+    		    	    			  }, dataType: "json"
+    		    	    		});
+    		    			}
+    		    			
+    		    			return false;
+    		    		});
+    			  },
+    			  dataType: "json"
+    			});
+    		});
+    		
+			$("#container").trigger("contentChanged");
+    	});
+    </script>
+    <script id="rowTemplate" type="text/x-jquery-tmpl">
+    	<tr style="cursor:pointer">
+			<td><input type="checkbox" data-key="${key}"/></td>
+            <td>${key}</td>
+            <td>${artist}</td>
+            <td>${title}</td>
+            <td>${album}</td>
+            <td>${year}</td>
+            <td>${duration}</td>
+        </tr>
+	</script>
+
+  </body>
+</html>

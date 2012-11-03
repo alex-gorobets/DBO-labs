@@ -3,7 +3,7 @@ package lib;
 import java.nio.ByteBuffer;
 
 public class ByteConverter {
-    public static final int STRING_LENGTH = 16;
+    public static final int STRING_LENGTH = 32;
     public static final int INT_LENGTH = 4;
     public static final int FLOAT_LENGTH = 4;
     public static final int LONG_LENGTH = 8;
