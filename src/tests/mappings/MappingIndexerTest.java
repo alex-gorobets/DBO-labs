@@ -25,9 +25,14 @@ public class MappingIndexerTest {
 		
 		mi = new MappingIndexer("tests/indexer");
 		
+		mi.removeOffset(2);
+		mi.removeOffset(1);
+		
+		mi.close();
+		mi = new MappingIndexer("tests/indexer");
+		
+		assertEquals(1, mi.getIndexesAmount());
 		assertEquals(1, mi.getIndex(0));
-		assertEquals(2, mi.getIndex(1));
-		assertEquals(3, mi.getIndex(2));
 	}
 
 }

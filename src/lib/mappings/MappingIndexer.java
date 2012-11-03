@@ -61,11 +61,16 @@ public class MappingIndexer {
      * @throws IOException
      */
     private void save() throws IOException {
+    	System.out.println(indexesContainer);
         indexesFileRepresentation.seek(0);
 
+        long length = 0;
         for(long l : indexesContainer) {
+        	length += Long.SIZE / 8;
             indexesFileRepresentation.writeLong(l);
         }
+        
+        indexesFileRepresentation.setLength(length);
     }
     
     /**
@@ -87,6 +92,7 @@ public class MappingIndexer {
 	}
 
 	public long getIndexesAmount() {
+		System.out.println(indexesContainer);
 		return indexesContainer.size();
 	}
 }
