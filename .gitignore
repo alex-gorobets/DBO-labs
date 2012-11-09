@@ -17,3 +17,4 @@ test.mapping
 .classpath
 .settings
 msdb.war
+*.java
