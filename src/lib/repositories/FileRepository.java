@@ -66,9 +66,10 @@ public class FileRepository implements Repository {
      */
     @Override
     public SongModel[] get(int limit, int offset) throws IOException {
-    	SongModel[] objects = new SongModel[(int) size()];
+    	int length = (int) size() < limit ? (int) size() : limit;
+    	SongModel[] objects = new SongModel[length];
     	
-    	for(int i = offset, j = 0; i < size() && j < limit; i++){
+    	for(int i = offset, j = 0; i < size() && j < limit; i++, j++){
         	db.seek(mappingDispatcher.getMapping(i).getOffset());
         	byte[] out = new byte[SongModel.SERIALIZED_LENGTH];
         	

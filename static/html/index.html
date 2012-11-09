@@ -50,7 +50,7 @@
       </div>
     </div>
 
-    <div class="container">
+    <div class="container" data-page="0">
     	<div id="menu">
     		<a href="#" id="menu-add" class="btn btn-primary">Add new record</a>
     		<a href="#" id="menu-find" class="btn btn-info">Find records</a>
@@ -58,10 +58,10 @@
     		<a href="#" id="menu-edit" class="btn btn-info disabled">Edit record</a>
     	</div>
     	
-    	<div id="modal-delete" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    	<div id="modal-delete" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="modal-delete-label" aria-hidden="true">
  			<div class="modal-header">
     			<button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
-    			<h3 id="myModalLabel">Removing confirmation</h3>
+    			<h3 id="modal-delete-label">Removing confirmation</h3>
   			</div>
   			<div class="modal-body">
     			<p>Are sure want remove selected items?</p>
@@ -72,10 +72,10 @@
   			</div>
 		</div>
     	
-    	<div id="modal-edit" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    	<div id="modal-edit" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="modal-edit-label" aria-hidden="true">
   			<div class="modal-header">
   				<button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
-  				  <h3 id="myModalLabel">Edit song</h3>
+  				  <h3 id="modal-edit-label">Edit song</h3>
   			</div>
   			<div class="modal-body">
 				<form class="form-horizontal" id="modal-edit-form">			
@@ -88,7 +88,7 @@
 				  <div class="control-group">
 				    <label class="control-label" for="inputTitle">Title</label>
 					    <div class="controls">
-					      <input type="text" name="title" disabled="disabled" id="inputTitle" placeholder="Title">
+					      <input type="text" name="title" id="inputTitle" placeholder="Title">
 				    </div>
 				  </div>
 				  <div class="control-group">
@@ -137,14 +137,11 @@
 
 <div class="pagination pagination-centered">
               <ul>
-                <li class="disabled"><a href="#">«</a></li>
-                <li class="active"><a href="#">1</a></li>
-                <li><a href="#">2</a></li>
-                <li><a href="#">3</a></li>
-                <li><a href="#">4</a></li>
-                <li><a href="#">5</a></li>
-                <li><a href="#">»</a></li>
+                <li class="disabled"><a href="#" id="page-prev">«</a></li>
+                <li><a href="#" id="page-next">»</a></li>
              </ul>
+            <p>Page <b><span id="page-view">1</span></b> of <b><span id="page-total">1</span></b></p>
+             
             </div>
 
     </div> <!-- /container -->
@@ -185,11 +182,19 @@
     		    return o;
     		};
     		
+    		$.fn.checkForErrors = function(response){
+    			if(response.error){
+    				alert("Error during request: " + response.error);
+    			}
+    		};
+    		
     		$("#container").bind("contentChanged", function(){
-    			$.ajax({
-    			  url: "/msdb/ajax?do=getAll",
+    			$.ajax({    				
+    			  url: "/msdb/ajax?do=get&offset=0",
     			  data: "",
     			  success: function(response){
+			 			$.fn.checkForErrors(response);
+
     				  	$("#container").html("");
     		    		$("#rowTemplate").tmpl(response.data).appendTo("#container");
     		    		
@@ -246,14 +251,18 @@
     		    					$.ajax({
   		    	    			 		url: "/msdb/ajax?do=remove&keys="+JSON.stringify(removedKeys),
   		    	    			 		success: function(response){
+  		    	    			 			$.fn.checkForErrors(response);
+  		    	    			 			
 		    	    		    			$("#menu").trigger("containerChanged");
 		    		    					$("#container").trigger("contentChanged");
-  		    	    			 		}
+  		    	    			 		}, dataType: "json"
     		    	    			});
     		    	    		
     		    					$("#modal-delete").modal("hide");
     	    		    		});
     		    			}
+    		    			
+    		    			return false;
     		    		});
     		    		
     		    		$("#menu-edit").click(function(){
@@ -263,6 +272,8 @@
     		    	    			  url: "/msdb/ajax?do=getByKey&key="+key,
     		    	    			  data: "",
     		    	    			  success: function(response){
+    		  		    	    			$("#modal-edit-label").html("Edit song");
+
 		    	    						$("#inputArtist").val(response.artist);
 		    	    						$("#inputTitle").val(response.title);
 		    	    						$("#inputAlbum").val(response.album);
@@ -276,11 +287,13 @@
     		        		    	    		$.ajax({
     		      		    	    			 	url: "/msdb/ajax?do=set&object="+JSON.stringify(json),
     		      		    	    			 	success: function(response){
+    		  		    	    			 			$.fn.checkForErrors(response);
+
     	        		    		    				$("#container").trigger("contentChanged");
-    		      		    	    			 	}
+    	        		    		    				$("#modal-edit").modal("hide");
+    		      		    	    			 	}, dataType: "json"
     		        		    	    		});
     		        		    	    		
-        		    		    				$("#modal-edit").modal("hide");
     		    	    		    		});
     		    	    		    		
     		    	    			  }, dataType: "json"
@@ -289,6 +302,39 @@
     		    			
     		    			return false;
     		    		});
+    		    		
+    		    		
+
+    		    		$("#menu-add").click(function(){
+		    	    		$("#modal-edit-label").html("Add song");
+
+		    	    		$("#inputArtist").val("");
+		    	    		$("#inputTitle").val("");
+		    	    		$("#inputAlbum").val("");
+		    	    		$("#inputYear").val("");
+		    	    		$("#inputDuration").val("");
+    		    	    			
+    		    		    $("#modal-edit").modal("show");
+    		    		    				
+    		    	    	$("#modal-save").click(function(){
+    		    	    		var json = $("#modal-edit-form").serializeObject();
+    		        			$.ajax({
+    		      		    	 	url: "/msdb/ajax?do=set&object="+JSON.stringify(json),
+    		      		    	 	success: function(response){
+    		  		    				$.fn.checkForErrors(response);
+
+    	        		    			$("#container").trigger("contentChanged");
+    	        		    			$("#modal-edit").modal("hide");
+    		      		    	 	}, dataType: "json"
+    		        			});
+    		        		    	    		
+    		    	    	});
+    		    	    	
+    		    			return false;
+    		    		});
+    		    		
+    		    		$()
+
     			  },
     			  dataType: "json"
     			});
